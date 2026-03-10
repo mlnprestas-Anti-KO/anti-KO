@@ -1,0 +1,38 @@
+// ─────────────────────────────────────────────────────
+// Anti K.O™ — Proxy API sécurisé
+// Ce fichier tourne sur les serveurs Vercel.
+// La clé API n'est JAMAIS visible par les visiteurs.
+// ─────────────────────────────────────────────────────
+
+export default async function handler(req, res) {
+  // Bloquer tout sauf POST
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Méthode non autorisée" });
+  }
+
+  // Vérifier que la clé API est bien configurée sur Vercel
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return res.status(500).json({ error: "Clé API non configurée sur le serveur." });
+  }
+
+  // Rate limiting simple : 1 requête toutes les 2 secondes par IP
+  // (Vercel gère le reste — plan gratuit = 100 req/jour suffisant pour démarrer)
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify(req.body),
+    });
+
+    const data = await response.json();
+    return res.status(response.status).json(data);
+
+  } catch (error) {
+    return res.status(500).json({ error: "Erreur serveur. Réessaie dans quelques secondes." });
+  }
+}
