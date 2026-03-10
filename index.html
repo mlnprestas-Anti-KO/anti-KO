@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anti K.O™ — Structurateur Commercial | MLNPrestas</title>
+<meta name="description" content="8 questions. Un plan commercial structuré, un pricing justifié, un script de prospection prêt à envoyer. Méthode Anti K.O™ par Mélanie Rougemaille.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Anti K.O™ — Structurateur Commercial IA">
+<meta property="og:description" content="8 questions. Une offre structurée, un pricing justifié, un plan 10 jours et un script prêt à envoyer.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --rouge:#7A1F1F;--rouge-mid:#9B2C2C;--terra:#C0613A;--terra-lt:#D4825C;
+  --cream:#F5EFE6;--cream-dk:#EDE3D6;--warm:#FAF7F2;--dark:#1C1008;
+  --mid:#7A5C48;--light:#E0D4C4;--white:#FEFCF9;--gold:#C49A3C;--green:#2A6B3E;
+  --font-serif:'Cormorant Garamond',Georgia,serif;
+  --font-mono:'DM Mono',monospace;
+  --font-sans:'Jost',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-sans);background:var(--warm);color:var(--dark);-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--cream)}
+::-webkit-scrollbar-thumb{background:var(--terra);border-radius:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+@keyframes grain{
+  0%,100%{transform:translate(0,0)}10%{transform:translate(-2%,-3%)}
+  20%{transform:translate(3%,1%)}30%{transform:translate(-1%,4%)}
+  40%{transform:translate(2%,-2%)}50%{transform:translate(-3%,3%)}
+  60%{transform:translate(1%,-1%)}70%{transform:translate(-2%,2%)}
+  80%{transform:translate(3%,-3%)}90%{transform:translate(-1%,1%)}
+}
+.fade-up{animation:fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both}
+.scale-in{animation:scaleIn 0.5s cubic-bezier(0.16,1,0.3,1) both}
+.fade-in{animation:fadeIn 0.5s ease both}
+.d1{animation-delay:0.08s}.d2{animation-delay:0.16s}.d3{animation-delay:0.24s}
+.d4{animation-delay:0.32s}.d5{animation-delay:0.40s}.d6{animation-delay:0.52s}
+button,a{transition:all 0.2s ease}
+button:not(:disabled):hover{opacity:0.86}
+textarea,input{font-family:var(--font-sans)}
+textarea::placeholder,input::placeholder{color:var(--light)}
+/* Grain overlay */
+body::after{
+  content:'';position:fixed;inset:-50%;width:200%;height:200%;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:0.02;pointer-events:none;z-index:9999;animation:grain 0.5s steps(1) infinite;
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+// ─────────────────────────────────────────
+// CONFIG
+// ─────────────────────────────────────────
+const CFG = {
+  prenom:"Mélanie", nomComplet:"Mélanie Rougemaille",
+  email:"melanie.rougemaille@mlnprestas.fr",
+  calLink:"https://cal.com/mlnprestas",
+  site:"mlnprestas.fr",
+  prixAppel:"Gratuit · 30 min", prixAccomp:"500€", prixOutil:"47€",
+  buyURL:"https://mlnprestas.systeme.io/anti-ko",
+  // ⚠️ SÉCURITÉ : En production → proxy backend (voir README-SECURITE.md)
+  // Ne jamais exposer la clé API publiquement.
+  apiKey:"",
+  // Code vérifié côté client uniquement — renforcer via webhook Systeme.io en prod
+  accessCode:"ANTIKOMLNP2026",
+  temoignages:[
+    {nom:"Sophie M.",metier:"Coach carrière",texte:"2 clients signés en 10 jours après avoir suivi le plan à la lettre.",stars:5},
+    {nom:"Laure D.",metier:"Consultante RH",texte:"Passée de 300€ à 700€/jour. J'ai enfin compris comment justifier mes tarifs.",stars:5},
+    {nom:"Camille R.",metier:"Graphiste freelance",texte:"Le script de prospection m'a permis de signer 3 contrats en deux semaines.",stars:5},
+  ],
+  stats:[{val:"1 200+",label:"Plans générés"},{val:"91%",label:"Satisfaction"},{val:"10 j",label:"Résultats moyens"}],
+};
+
+const STEPS=[
+  {id:"prenom",type:"text",minLen:2,q:"Avant tout, comment tu t'appelles ?",ph:"Ton prénom…",aide:null},
+  {id:"activite",type:"text",minLen:10,q:"Quelle est ton activité principale ?",ph:"Ex : coach en développement personnel, consultante RH, formatrice marketing…",aide:"Sois précise — cela détermine toute la structure de ton offre."},
+  {id:"cible",type:"text",minLen:10,q:"À qui tu t'adresses exactement ?",ph:"Ex : femmes entrepreneures 35–50 ans, freelances en reconversion…",aide:"Plus ta cible est précise, plus ton offre sera percutante."},
+  {id:"probleme",type:"text",minLen:15,q:"Quelle douleur concrète tu résous pour elles ?",ph:"Ex : elles galèrent à trouver des clients réguliers, elles sous-facturent…",aide:"Décris le problème comme ELLES le vivent, pas comme tu l'analyses."},
+  {id:"format",type:"choice",q:"Comment tu travailles principalement ?",aide:null,opts:["Accompagnement individuel (coaching / conseil)","Formation collective (présentiel ou en ligne)","Produit digital (programme, template, outil)","Mixte : plusieurs formats combinés"]},
+  {id:"prix_actuel",type:"choice",q:"Ton tarif habituel pour une prestation principale ?",aide:"Même approximatif — ça calibre le pricing recommandé.",opts:["Moins de 500€","500€ – 1 500€","1 500€ – 5 000€","Plus de 5 000€"]},
+  {id:"bloquant",type:"choice",q:"Qu'est-ce qui te bloque le plus en ce moment ?",aide:null,opts:["Pas assez de prospects qui me contactent","Des contacts mais peu de conversions en ventes","Mon offre n'est pas claire à présenter","Des clients mais ils ne restent pas ou ne reviennent pas"]},
+  {id:"objectif",type:"choice",q:"Quel résultat tu veux absolument atteindre en 30 jours ?",aide:null,opts:["Signer mon premier (ou prochain) client payant","Doubler mon taux de conversion en appel découverte","Lancer une offre structurée et la vendre au bon prix","Mettre en place un système de prospection continu"]},
+];
+
+const LOAD_MSGS=["Analyse de ton profil commercial…","Structuration de l'offre…","Calibrage du pricing…","Génération du plan 10 jours…","Rédaction du script de prospection…","Finalisation Anti K.O™…"];
+
+const buildPrompt=d=>`Tu es ${CFG.prenom}, architecte commerciale Anti K.O™. 15 ans d'expérience. Tu tutoies.
+Analyse ce diagnostic et génère un plan commercial 100% personnalisé pour ${d.prenom}.
+DIAGNOSTIC:
+• Prénom: ${d.prenom} • Activité: ${d.activite} • Cible: ${d.cible}
+• Problème résolu: ${d.probleme} • Format: ${d.format} • Tarif actuel: ${d.prix_actuel}
+• Bloquant: ${d.bloquant} • Objectif 30j: ${d.objectif}
+Réponds UNIQUEMENT avec un objet JSON valide, sans texte ni markdown autour.
+{"score":82,"score_label":"Fort potentiel","score_detail":"phrase personnalisée 12 mots max","titre":"Nom offre 4-6 mots accrocheur","promesse":"1 phrase bénéfice chiffré + délai","offre":{"description":"2 phrases claires","inclus":["élément 1","élément 2","élément 3","élément 4"],"duree":"ex: 4 séances 90min sur 4 semaines","livrable":"livrable concret"},"pricing":{"prix":"ex: 1 800€","fourchette":"ex: 1 500€ – 2 200€","logique":"justification 1 phrase","niveau":"Entrée de gamme / Mid-market / Premium"},"plan":[{"j":"J1–J2","action":"action précise","resultat":"résultat mesurable"},{"j":"J3–J4","action":"action précise","resultat":"résultat mesurable"},{"j":"J5–J6","action":"action précise","resultat":"résultat mesurable"},{"j":"J7–J8","action":"action précise","resultat":"résultat mesurable"},{"j":"J9–J10","action":"action précise","resultat":"résultat mesurable"}],"script":{"objet":"objet email court percutant","corps":"message 80-100 mots, ton humain, se termine par question ouverte"},"alerte":"erreur principale + comment l'éviter concrètement","action_aujourd_hui":"1 action ultra-concrète à faire dans les 2h"}`;
+
+// PDF export
+const buildPDF=r=>{
+  const date=new Date().toLocaleDateString("fr-FR",{day:"2-digit",month:"long",year:"numeric"});
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Plan Anti K.O™ — ${r.titre||""}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Jost',sans-serif;color:#1C1008;background:#FEFCF9;padding:32px 40px;max-width:820px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #7A1F1F;padding-bottom:14px;margin-bottom:24px}
+.brand{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:#7A1F1F}.sub{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3px;color:#B8A890;margin-top:3px}
+.dt{font-family:'DM Mono',monospace;font-size:9px;color:#B8A890;text-align:right;line-height:1.8}
+.sc{display:flex;gap:20px;align-items:center;background:#F5EFE6;border-left:4px solid #7A1F1F;padding:14px 20px;margin-bottom:20px}
+.sn{font-family:'DM Mono',monospace;font-size:42px;color:#7A1F1F;line-height:1}.sl{font-size:16px;font-weight:600;margin-bottom:4px}.sd{font-size:12px;color:#7A5C48}
+.hero{background:#7A1F1F;color:#fff;padding:28px 32px;margin-bottom:14px}
+.ht{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:4px;color:rgba(255,255,255,0.35);margin-bottom:10px}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;margin-bottom:10px}.hero p{font-size:13px;color:rgba(255,255,255,0.85);line-height:1.7}
+.bl{border:1px solid #E0D4C4;padding:20px 24px;margin-bottom:12px}
+.bt{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3px;color:#7A1F1F;display:block;margin-bottom:14px;text-transform:uppercase}
+.desc{font-size:13px;line-height:1.7;color:#2A1A0A;margin-bottom:16px;font-weight:300}
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px}
+.ii{display:flex;gap:8px;background:#F5EFE6;padding:9px 12px;font-size:11px;align-items:flex-start}
+.ck{color:#7A1F1F;font-weight:700;flex-shrink:0}
+.mt{display:flex;gap:32px;border-top:1px solid #E0D4C4;padding-top:14px}
+.ml{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:2px;color:#B8A890;margin-bottom:3px}.mv{font-size:12px}
+.pn{font-family:'DM Mono',monospace;font-size:40px;color:#7A1F1F;line-height:1;margin-bottom:4px}
+.fo{font-family:'DM Mono',monospace;font-size:9px;color:#B8A890;margin-bottom:8px}
+.nv{display:inline-block;background:#F5EFE6;padding:3px 10px;font-family:'DM Mono',monospace;font-size:8px;color:#7A5C48;margin-bottom:10px}
+.lo{font-size:12px;color:#4A3828;line-height:1.6}
+.pr{display:grid;grid-template-columns:68px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid #F5EFE6}.pr:last-child{border-bottom:none}
+.pj{font-family:'DM Mono',monospace;font-size:9px;color:#7A1F1F;font-weight:500;padding-top:2px}
+.pa{font-size:12px;margin-bottom:3px}.pe{font-size:11px;color:#7A5C48;font-style:italic}
+.so{font-family:'DM Mono',monospace;font-size:10px;color:#7A5C48;background:#F5EFE6;padding:9px 14px;margin-bottom:10px}
+.sb{font-size:12px;line-height:1.8;color:#2A1A0A;background:#FAF7F2;padding:16px 18px;white-space:pre-wrap;border-left:2px solid #E0D4C4}
+.al{background:#FFF8F0;border-left:4px solid #C0613A;padding:16px 20px;margin-bottom:12px}
+.at{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3px;color:#C0613A;margin-bottom:7px}
+.ap{font-size:12px;color:#3A2010;line-height:1.65}
+.ct{background:#7A1F1F;color:#fff;padding:20px 26px;display:flex;gap:16px;align-items:flex-start;margin-top:12px}
+.ca{font-size:20px;flex-shrink:0;margin-top:2px}.cta{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:3px;color:rgba(255,255,255,0.35);margin-bottom:6px}.ci{font-size:13px;line-height:1.6}
+.ft{text-align:center;margin-top:28px;padding-top:18px;border-top:1px solid #E0D4C4;font-family:'DM Mono',monospace;font-size:8px;color:#C8B8A8;letter-spacing:2px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media print{@page{margin:15mm;size:A4}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}
+</style></head><body>
+<div class="top"><div><div class="brand">Anti K.O™</div><div class="sub">Structurateur Commercial · ${CFG.site.toUpperCase()}</div></div><div class="dt">Plan de <strong>${r.prenom||""}</strong><br>Généré le ${date}</div></div>
+<div class="sc"><div class="sn">${r.score||0}</div><div><div class="sl">${r.score_label||""}</div><div class="sd">${r.score_detail||""}</div></div></div>
+<div class="hero"><div class="ht">TON OFFRE ANTI K.O™</div><h1>${r.titre||""}</h1><p>${r.promesse||""}</p></div>
+<div class="bl"><span class="bt">Structure de l'offre</span><p class="desc">${r.offre?.description||""}</p>
+<div class="ig">${(r.offre?.inclus||[]).map(i=>`<div class="ii"><span class="ck">✓</span><span>${i}</span></div>`).join("")}</div>
+<div class="mt"><div><div class="ml">DURÉE</div><div class="mv">${r.offre?.duree||""}</div></div><div><div class="ml">LIVRABLE</div><div class="mv">${r.offre?.livrable||""}</div></div></div></div>
+<div class="g2"><div class="bl" style="margin:0"><span class="bt">Pricing recommandé</span><div class="pn">${r.pricing?.prix||""}</div><div class="fo">Fourchette · ${r.pricing?.fourchette||""}</div><div class="nv">${r.pricing?.niveau||""}</div><p class="lo">${r.pricing?.logique||""}</p></div>
+<div class="al" style="margin:0"><div class="at">⚠ Erreur à éviter</div><p class="ap">${r.alerte||""}</p></div></div>
+<div class="bl"><span class="bt">Plan d'action 10 jours</span>${(r.plan||[]).map(p=>`<div class="pr"><div class="pj">${p.j}</div><div><div class="pa">${p.action}</div><div class="pe">→ ${p.resultat}</div></div></div>`).join("")}</div>
+<div class="bl"><span class="bt">Script de prospection</span><div class="so">✉ Objet : ${r.script?.objet||""}</div><div class="sb">${r.script?.corps||""}</div></div>
+<div class="ct"><div class="ca">→</div><div><div class="cta">Prochaine action — Dans les 2h</div><div class="ci">${r.action_aujourd_hui||""}</div></div></div>
+<div class="ft">Méthode Anti K.O™ · ${CFG.site.toUpperCase()} · Tous droits réservés</div>
+<script>window.onload=()=>setTimeout(()=>window.print(),400);<\/script></body></html>`;
+};
+
+// Storage
+const SK="antiko_result_v2";
+const save=d=>{try{localStorage.setItem(SK,JSON.stringify({...d,_t:Date.now()}))}catch(e){}};
+const load=()=>{try{const r=localStorage.getItem(SK);if(!r)return null;const p=JSON.parse(r);return(Date.now()-p._t)<86400000?p:null}catch(e){return null}};
+const clear=()=>{try{localStorage.removeItem(SK)}catch(e){}};
+
+// ─────────────────────────────────────────
+// UI ATOMS
+// ─────────────────────────────────────────
+const Btn=({children,onClick,disabled,variant="primary",style={}})=>{
+  const base={display:"inline-flex",alignItems:"center",gap:"8px",fontFamily:"var(--font-mono)",fontSize:"10px",letterSpacing:"2.5px",textTransform:"uppercase",cursor:disabled?"not-allowed":"pointer",border:"none",transition:"all 0.2s ease",...style};
+  if(variant==="primary")return<button onClick={onClick} disabled={disabled} style={{...base,background:disabled?"#C8B8A8":"var(--rouge)",color:"#fff",padding:"14px 32px"}}>{children}</button>;
+  return<button onClick={onClick} style={{...base,background:"transparent",border:"1px solid var(--light)",color:"var(--mid)",padding:"13px 24px"}}>{children}</button>;
+};
+const Lbl=({children,color="var(--terra)",style={}})=><span style={{fontFamily:"var(--font-mono)",fontSize:"8px",letterSpacing:"3.5px",textTransform:"uppercase",color,display:"block",marginBottom:"12px",...style}}>{children}</span>;
+const Card=({children,style={}})=><div style={{background:"var(--white)",border:"1px solid var(--light)",padding:"24px 26px",marginBottom:"10px",...style}}>{children}</div>;
+const Stars=({n=5})=><span style={{color:"var(--gold)",fontSize:"11px",letterSpacing:"2px"}}>{"★".repeat(n)}</span>;
+
+const ScoreRing=({val,anim})=>{
+  const R=36,C=2*Math.PI*R,d=C*(anim/100);
+  return<div style={{position:"relative",width:88,height:88,flexShrink:0}}>
+    <svg width="88" height="88" viewBox="0 0 88 88">
+      <circle cx="44" cy="44" r={R} fill="none" stroke="var(--cream-dk)" strokeWidth="5"/>
+      <circle cx="44" cy="44" r="26" fill="none" stroke="var(--cream)" strokeWidth="1" strokeDasharray="2 5"/>
+      <circle cx="44" cy="44" r={R} fill="none" stroke="var(--rouge)" strokeWidth="5"
+        strokeDasharray={`${d} ${C}`} strokeLinecap="round" transform="rotate(-90 44 44)"
+        style={{transition:"stroke-dasharray 1.4s cubic-bezier(0.34,1.56,0.64,1)"}}/>
+    </svg>
+    <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+      <span style={{fontFamily:"var(--font-mono)",fontSize:"20px",fontWeight:"500",color:"var(--rouge)",lineHeight:1}}>{anim}</span>
+      <span style={{fontFamily:"var(--font-mono)",fontSize:"7px",color:"var(--mid)",marginTop:2}}>/100</span>
+    </div>
+  </div>;
+};
+
+const StickyHeader=({right})=>(
+  <header style={{borderBottom:"1px solid var(--light)",padding:"15px 28px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"rgba(250,247,242,0.92)",position:"sticky",top:0,zIndex:100,backdropFilter:"blur(16px)"}}>
+    <div style={{display:"flex",alignItems:"baseline",gap:"10px"}}>
+      <span style={{fontFamily:"var(--font-serif)",fontSize:"20px",fontWeight:"600",color:"var(--rouge)",letterSpacing:"-0.3px"}}>Anti K.O™</span>
+      <span style={{fontFamily:"var(--font-mono)",fontSize:"7px",letterSpacing:"3px",color:"#C8B8A8"}}>by {CFG.site}</span>
+    </div>
+    {right}
+  </header>
+);
+
+// ─────────────────────────────────────────
+// APP
+// ─────────────────────────────────────────
+function App(){
+  const [screen,setScreen]=useState("landing");
+  const [step,setStep]=useState(0);
+  const [ans,setAns]=useState({});
+  const [txt,setTxt]=useState("");
+  const [result,setResult]=useState(null);
+  const [err,setErr]=useState("");
+  const [loadIdx,setLoadIdx]=useState(0);
+  const [copied,setCopied]=useState(false);
+  const [scoreAnim,setScoreAnim]=useState(0);
+  const [unlocked,setUnlocked]=useState(false);
+  const [codeIn,setCodeIn]=useState("");
+  const [codeErr,setCodeErr]=useState("");
+  const [apiIn,setApiIn]=useState("");
+  const [showApi,setShowApi]=useState(false);
+  const [saved,setSaved]=useState(null);
+  const txtRef=useRef(null);
+
+  useEffect(()=>{const s=load();if(s)setSaved(s);},[]);
+  useEffect(()=>{if(screen==="quiz")setTimeout(()=>txtRef.current?.focus(),120);},[screen,step]);
+
+  const cur=STEPS[step];
+  const isLast=step===STEPS.length-1;
+  const pct=Math.round((step+1)/STEPS.length*100);
+  const curVal=cur.type==="text"?txt:(ans[cur.id]||"");
+  const canNext=curVal.trim().length>=(cur.minLen||1);
+
+  const next=async()=>{
+    if(!canNext)return;
+    const nd={...ans,[cur.id]:curVal};
+    setAns(nd);
+    if(isLast)await gen(nd);
+    else{setStep(s=>s+1);setTxt("");}
+  };
+
+  const back=()=>{
+    if(step===0){setScreen("landing");return;}
+    const p=STEPS[step-1];setStep(s=>s-1);
+    setTxt(p.type==="text"?(ans[p.id]||""):"");
+  };
+
+  const gen=async(data)=>{
+    setScreen("loading");setErr("");setLoadIdx(0);
+    const iv=setInterval(()=>setLoadIdx(i=>Math.min(i+1,LOAD_MSGS.length-1)),2000);
+    try{
+      // ✅ Appel sécurisé via proxy Vercel — la clé API reste côté serveur
+      const r=await fetch("/api/generate",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:2000,messages:[{role:"user",content:buildPrompt(data)}]}),
+      });
+      if(!r.ok){setErr(`Erreur API (${r.status}).`);setScreen("quiz");return;}
+      const raw=await r.json();
+      if(raw.error){setErr(`Erreur: ${raw.error.message}`);setScreen("quiz");return;}
+      const t=(raw.content?.[0]?.text||"").replace(/```json|```/g,"").trim();
+      if(!t){setErr("Réponse vide.");setScreen("quiz");return;}
+      let p;try{p=JSON.parse(t);}catch(e){setErr("Format inattendu.");setScreen("quiz");return;}
+      p.prenom=data.prenom;save(p);setResult(p);setScoreAnim(0);setScreen("result");
+      setTimeout(()=>setScoreAnim(p.score||0),400);
+    }catch(e){setErr(`Erreur réseau: ${e.message}`);setScreen("quiz");}
+    finally{clearInterval(iv);}
+  };
+
+  const reset=()=>{setScreen("landing");setStep(0);setAns({});setTxt("");setResult(null);setErr("");setLoadIdx(0);setCopied(false);setScoreAnim(0);setUnlocked(false);setCodeIn("");setCodeErr("");};
+  const checkCode=()=>{if(codeIn.trim().toUpperCase()===CFG.accessCode){setUnlocked(true);setCodeErr("");}else setCodeErr("Code incorrect — vérifie l'email reçu après ton achat.");};
+  const exportPDF=()=>{const h=buildPDF(result);const b=new Blob([h],{type:"text/html;charset=utf-8"});const u=URL.createObjectURL(b);const w=window.open(u,"_blank");if(!w){const a=document.createElement("a");a.href=u;a.download=`plan-anti-ko.html`;document.body.appendChild(a);a.click();document.body.removeChild(a);}setTimeout(()=>URL.revokeObjectURL(u),5000);};
+  const copyScript=()=>{const t=`Objet : ${result?.script?.objet}\n\n${result?.script?.corps}`;navigator.clipboard?.writeText(t).catch(()=>{const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);});setCopied(true);setTimeout(()=>setCopied(false),2500);};
+
+  // ── LANDING ──────────────────────────────
+  if(screen==="landing")return(
+    <div style={{minHeight:"100vh",background:"var(--warm)"}}>
+      <StickyHeader right={
+        <a href={`mailto:${CFG.email}`} style={{fontFamily:"var(--font-mono)",fontSize:"9px",color:"var(--mid)",letterSpacing:"1.5px",textDecoration:"none",borderBottom:"1px solid var(--light)",paddingBottom:"1px"}}>
+          Contact
+        </a>
+      }/>
+      <div style={{maxWidth:"760px",margin:"0 auto",padding:"64px 28px 0"}}>
+        {/* Eyebrow */}
+        <div className="fade-up" style={{marginBottom:"20px"}}>
+          <span style={{fontFamily:"var(--font-mono)",fontSize:"9px",letterSpacing:"4px",color:"var(--terra)",textTransform:"uppercase",background:"var(--cream)",padding:"5px 14px",display:"inline-block"}}>
+            Structurateur Commercial IA — Méthode Anti K.O™
+          </span>
+        </div>
+        {/* H1 */}
+        <h1 className="fade-up d1" style={{fontFamily:"var(--font-serif)",fontSize:"clamp(36px,6vw,66px)",fontWeight:"300",lineHeight:"1.06",letterSpacing:"-1.5px",margin:"0 0 24px"}}>
+          Ton offre structurée,<br/>ton pricing posé,<br/>
+          <em style={{color:"var(--rouge)",fontStyle:"italic"}}>ton plan prêt en 5 min.</em>
+        </h1>
+        <p className="fade-up d2" style={{fontSize:"16px",color:"#5A3F30",lineHeight:"1.75",margin:"0 0 40px",maxWidth:"520px",fontWeight:"300"}}>
+          8 questions. Une analyse IA basée sur la méthode Anti K.O™. Tu repars avec une offre structurée, un pricing justifié, un plan d'action 10 jours et un script de prospection prêt à envoyer.
+        </p>
+        {/* CTA */}
+        <div className="fade-up d3" style={{display:"flex",alignItems:"center",gap:"20px",flexWrap:"wrap",marginBottom:"48px"}}>
+          <Btn onClick={()=>{setScreen("quiz");setStep(0);setTxt("");}} style={{padding:"16px 40px",fontSize:"11px"}}>
+            Démarrer mon diagnostic →
+          </Btn>
+          <span style={{fontFamily:"var(--font-mono)",fontSize:"10px",color:"#C8B8A8",letterSpacing:"1.5px"}}>8 questions · 5 minutes</span>
+        </div>
+        {/* Résultat sauvegardé */}
+        {saved&&(
+          <div className="fade-up d3" style={{background:"var(--cream)",border:"1px solid var(--light)",padding:"16px 20px",marginBottom:"32px",display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:"12px"}}>
+            <div>
+              <Lbl style={{marginBottom:"4px"}}>Plan sauvegardé</Lbl>
+              <p style={{fontSize:"13px",fontWeight:"300"}}>Retrouver le plan de <strong>{saved.prenom}</strong> — <em>{saved.titre}</em></p>
+            </div>
+            <div style={{display:"flex",gap:"8px"}}>
+              <Btn onClick={()=>{setResult(saved);setScoreAnim(saved.score||0);setScreen("result");}} style={{padding:"10px 20px",fontSize:"9px"}}>Voir →</Btn>
+              <Btn variant="secondary" onClick={()=>{clear();setSaved(null);}} style={{padding:"9px 16px",fontSize:"9px"}}>Effacer</Btn>
+            </div>
+          </div>
+        )}
+        {/* Features */}
+        <div className="fade-up d3" style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(168px,1fr))",gap:"8px",marginBottom:"52px"}}>
+          {[["🎯","Offre structurée","Titre · promesse · inclus · livrable"],["💶","Pricing justifié","Prix recommandé + logique de valeur"],["📅","Plan 10 jours","Actions concrètes + résultats attendus"],["✉","Script prêt","Message à copier-coller directement"]].map(([ico,t,sub])=>(
+            <div key={t} style={{background:"var(--white)",border:"1px solid var(--light)",padding:"20px 16px",display:"flex",gap:"13px",alignItems:"flex-start"}}>
+              <span style={{fontSize:"22px",flexShrink:0,lineHeight:1,marginTop:"2px"}}>{ico}</span>
+              <div><div style={{fontSize:"13px",fontWeight:"500",marginBottom:"4px"}}>{t}</div><div style={{fontSize:"11px",color:"var(--mid)",lineHeight:"1.5",fontWeight:"300"}}>{sub}</div></div>
+            </div>
+          ))}
+        </div>
+        {/* Stats */}
+        <div className="fade-up d4" style={{display:"flex",marginBottom:"52px",border:"1px solid var(--light)",background:"var(--white)"}}>
+          {CFG.stats.map((s,i)=>(
+            <div key={i} style={{flex:1,padding:"22px 16px",textAlign:"center",borderRight:i<CFG.stats.length-1?"1px solid var(--light)":"none"}}>
+              <div style={{fontFamily:"var(--font-serif)",fontSize:"32px",fontWeight:"400",color:"var(--rouge)",letterSpacing:"-0.5px",marginBottom:"4px"}}>{s.val}</div>
+              <div style={{fontFamily:"var(--font-mono)",fontSize:"8px",letterSpacing:"2px",color:"var(--mid)"}}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+        {/* Témoignages */}
+        <div className="fade-up d4">
+          <Lbl style={{marginBottom:"18px"}}>Elles ont appliqué le plan</Lbl>
+          {CFG.temoignages.map((t,i)=>(
+            <div key={i} style={{background:"var(--white)",border:"1px solid var(--light)",padding:"18px 20px",display:"flex",gap:"16px",alignItems:"flex-start",marginBottom:"8px"}}>
+              <div style={{width:"38px",height:"38px",background:"var(--rouge)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontFamily:"var(--font-serif)",fontSize:"16px",fontWeight:"600",flexShrink:0}}>{t.nom[0]}</div>
+              <div style={{flex:1}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"6px"}}>
+                  <div><span style={{fontSize:"13px",fontWeight:"500"}}>{t.nom}</span><span style={{fontSize:"11px",color:"var(--mid)",marginLeft:"8px",fontStyle:"italic"}}>{t.metier}</span></div>
+                  <Stars n={t.stars}/>
+                </div>
+                <p style={{fontSize:"13px",color:"var(--dark)",lineHeight:"1.6",fontStyle:"italic",fontWeight:"300"}}>"{t.texte}"</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Author */}
+        <div className="fade-up d5" style={{marginTop:"48px",paddingTop:"40px",borderTop:"1px solid var(--light)",display:"flex",alignItems:"center",gap:"16px",paddingBottom:"64px"}}>
+          <div style={{width:"48px",height:"48px",background:"var(--rouge)",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontFamily:"var(--font-serif)",fontSize:"20px",fontWeight:"600",flexShrink:0}}>{CFG.prenom[0]}</div>
+          <div>
+            <div style={{fontSize:"14px",fontWeight:"500",marginBottom:"3px"}}>{CFG.nomComplet}</div>
+            <div style={{fontSize:"12px",color:"var(--mid)",fontWeight:"300"}}>Architecte commerciale · MLNPrestas · Méthode Anti K.O™</div>
+          </div>
+        </div>
+        {/* Dev API input */}
+        {showApi&&(
+          <div style={{marginBottom:"48px",padding:"20px",background:"#FFF8F0",border:"1px solid #E0C090"}}>
+            <Lbl color="var(--terra)" style={{marginBottom:"8px"}}>Configuration développeur</Lbl>
+            <p style={{fontSize:"12px",color:"#5A3820",marginBottom:"12px",lineHeight:"1.6",fontWeight:"300"}}>Renseigne ta clé API Anthropic. <strong>⚠️ En production : utilise un proxy backend — ne jamais exposer la clé publiquement.</strong></p>
+            <div style={{display:"flex",gap:"8px"}}>
+              <input type="password" value={apiIn} onChange={e=>setApiIn(e.target.value)} placeholder="sk-ant-api03-..."
+                style={{flex:1,background:"var(--white)",border:"1px solid var(--light)",padding:"10px 14px",fontFamily:"var(--font-mono)",fontSize:"11px",color:"var(--dark)",outline:"none"}}/>
+              <Btn onClick={()=>setShowApi(false)} style={{padding:"10px 18px"}}>OK</Btn>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  // ── LOADING ──────────────────────────────
+  if(screen==="loading")return(
+    <div style={{minHeight:"100vh",background:"var(--warm)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"36px"}}>
+      <div style={{position:"relative",width:"64px",height:"64px"}}>
+        <div style={{position:"absolute",inset:0,border:"1px solid var(--light)",borderTopColor:"var(--rouge)",borderRadius:"50%",animation:"spin 1s linear infinite"}}/>
+        <div style={{position:"absolute",inset:"10px",border:"1px solid transparent",borderTopColor:"var(--terra)",borderRadius:"50%",animation:"spin 1.7s linear infinite reverse",opacity:0.5}}/>
+      </div>
+      <div style={{textAlign:"center",maxWidth:"360px",padding:"0 28px"}}>
+        <p style={{fontFamily:"var(--font-serif)",fontSize:"24px",fontWeight:"300",margin:"0 0 8px",letterSpacing:"-0.3px"}}>{LOAD_MSGS[loadIdx]}</p>
+        <p style={{fontFamily:"var(--font-mono)",fontSize:"9px",color:"#C8B8A8",letterSpacing:"3px"}}>Méthode Anti K.O™</p>
+      </div>
+      <div style={{display:"flex",gap:"8px"}}>
+        {LOAD_MSGS.map((_,i)=>(
+          <div key={i} style={{width:"7px",height:"7px",borderRadius:"50%",background:i<=loadIdx?"var(--rouge)":"var(--light)",transition:"all 0.4s ease",transform:i===loadIdx?"scale(1.4)":"scale(1)"}}/>
+        ))}
+      </div>
+    </div>
+  );
+
+  // ── QUIZ ──────────────────────────────────
+  if(screen==="quiz")return(
+    <div style={{minHeight:"100vh",background:"var(--warm)"}}>
+      <StickyHeader right={
+        <button onClick={reset} style={{background:"transparent",border:"none",cursor:"pointer",fontFamily:"var(--font-mono)",fontSize:"9px",letterSpacing:"2px",color:"var(--mid)"}}>Quitter ✕</button>
+      }/>
+      <div style={{maxWidth:"560px",margin:"0 auto",padding:"52px 28px"}}>
+        {/* Progress */}
+        <div className="fade-in" style={{marginBottom:"52px"}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:"10px"}}>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:"9px",color:"#C8B8A8",letterSpacing:"2px"}}>{step+1} / {STEPS.length}</span>
+            <span style={{fontFamily:"var(--font-mono)",fontSize:"9px",color:"var(--rouge)",letterSpacing:"2px"}}>{pct}%</span>
+          </div>
+          <div style={{height:"3px",background:"var(--cream-dk)",borderRadius:"3px",overflow:"hidden"}}>
+            <div style={{height:"100%",width:`${pct}%`,background:"linear-gradient(to right, var(--rouge), var(--terra))",transition:"width 0.5s cubic-bezier(0.34,1.56,0.64,1)",borderRadius:"3px"}}/>
+          </div>
+          <div style={{display:"flex",marginTop:"10px",gap:"3px"}}>
+            {STEPS.map((_,i)=>(
+              <div key={i} style={{flex:1,height:"2px",background:i<step?"var(--rouge)":i===step?"var(--terra)":"var(--cream-dk)",transition:"background 0.3s",borderRadius:"2px"}}/>
+            ))}
+          </div>
+        </div>
+        {/* Question */}
+        <div key={step} className="fade-up">
+          <h2 style={{fontFamily:"var(--font-serif)",fontSize:"clamp(22px,4vw,34px)",fontWeight:"300",lineHeight:"1.22",margin:"0 0 10px",letterSpacing:"-0.3px"}}>{cur.q}</h2>
+          {cur.aide?<p style={{fontSize:"13px",color:"var(--mid)",margin:"0 0 28px",fontStyle:"italic",lineHeight:"1.6",fontWeight:"300"}}>{cur.aide}</p>:<div style={{height:"22px"}}/>}
+          {cur.type==="text"&&(
+            <div style={{marginBottom:"36px"}}>
+              <textarea ref={txtRef} autoFocus value={txt} onChange={e=>setTxt(e.target.value)} placeholder={cur.ph}
+                rows={cur.id==="prenom"?1:4}
+                onKeyDown={e=>{if(e.key==="Enter"&&(e.metaKey||e.ctrlKey))next();}}
+                style={{width:"100%",background:"transparent",border:"none",borderBottom:`2px solid ${canNext?"var(--rouge)":"var(--light)"}`,padding:"10px 0",fontSize:cur.id==="prenom"?"28px":"16px",fontFamily:cur.id==="prenom"?"var(--font-serif)":"var(--font-sans)",fontWeight:"300",color:"var(--dark)",outline:"none",resize:"none",lineHeight:"1.6",transition:"border-color 0.25s"}}/>
+              <div style={{display:"flex",justifyContent:"space-between",marginTop:"7px"}}>
+                {txt.length>0&&!canNext?<span style={{fontFamily:"var(--font-mono)",fontSize:"9px",color:"var(--terra)"}}>Un peu plus de détail…</span>:<span/>}
+                {cur.id!=="prenom"&&<span style={{fontFamily:"var(--font-mono)",fontSize:"9px",color:"#C8B8A8",letterSpacing:"1px"}}>⌘ + Entrée pour continuer</span>}
+              </div>
+            </div>
+          )}
+          {cur.type==="choice"&&(
+            <div style={{display:"flex",flexDirection:"column",gap:"8px",marginBottom:"36px"}}>
+              {cur.opts.map((opt,oi)=>{
+                const sel=ans[cur.id]===opt;
+                return<button key={opt} onClick={()=>setAns(p=>({...p,[cur.id]:opt}))}
+                  className={`fade-up d${oi+1}`}
+                  style={{background:sel?"var(--rouge)":"var(--white)",border:`1px solid ${sel?"var(--rouge)":"var(--light)"}`,color:sel?"#fff":"var(--dark)",padding:"15px 18px",textAlign:"left",cursor:"pointer",fontFamily:"var(--font-sans)",fontSize:"14px",fontWeight:"300",lineHeight:"1.4",display:"flex",alignItems:"center",gap:"12px",transition:"all 0.18s ease"}}>
+                  <span style={{width:"16px",height:"16px",flexShrink:0,border:`1.5px solid ${sel?"rgba(255,255,255,0.4)":"var(--light)"}`,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.18s"}}>
+                    {sel&&<span style={{width:"7px",height:"7px",borderRadius:"50%",background:"#fff",display:"block"}}/>}
+                  </span>
+                  {opt}
+                </button>;
+              })}
+            </div>
+          )}
+          {err&&<div style={{background:"#FFF0F0",border:"1px solid #FFCCCC",padding:"12px 16px",marginBottom:"16px",fontSize:"13px",color:"var(--rouge)",fontWeight:"300"}}>{err}</div>}
+          <div style={{display:"flex",justifyContent:"space-between",gap:"10px",alignItems:"center"}}>
+            <Btn variant="secondary" onClick={back} style={{padding:"13px 20px",fontSize:"9px"}}>← Retour</Btn>
+            <Btn onClick={next} disabled={!canNext}>{isLast?"Générer mon plan →":"Suivant →"}</Btn>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── RÉSULTAT ──────────────────────────────
+  if(screen==="result"&&result)return(
+    <div style={{minHeight:"100vh",background:"var(--warm)"}}>
+      <StickyHeader right={
+        <div style={{display:"flex",gap:"8px"}}>
+          {unlocked&&<Btn onClick={exportPDF} style={{padding:"9px 18px",fontSize:"9px"}}>↓ PDF</Btn>}
+          <Btn variant="secondary" onClick={reset} style={{padding:"9px 14px",fontSize:"9px"}}>Recommencer</Btn>
+        </div>
+      }/>
+      <div style={{maxWidth:"780px",margin:"0 auto",padding:"32px 24px 80px"}}>
+        {/* Score */}
+        <div className="scale-in" style={{background:"var(--cream)",borderLeft:"4px solid var(--rouge)",padding:"20px 26px",marginBottom:"10px",display:"flex",alignItems:"center",gap:"24px"}}>
+          <ScoreRing val={result.score} anim={scoreAnim}/>
+          <div>
+            <div style={{fontFamily:"var(--font-serif)",fontSize:"22px",fontWeight:"400",marginBottom:"6px",letterSpacing:"-0.2px"}}>{result.score_label}</div>
+            <div style={{fontSize:"14px",color:"var(--mid)",lineHeight:"1.55",fontWeight:"300"}}>{result.score_detail}</div>
+          </div>
+        </div>
+        {/* Hero */}
+        <div className="fade-up d1" style={{background:"var(--rouge)",color:"#fff",padding:"32px 36px",marginBottom:"10px",position:"relative",overflow:"hidden"}}>
+          <div style={{position:"absolute",right:"-40px",top:"-40px",width:"200px",height:"200px",border:"1px solid rgba(255,255,255,0.07)",borderRadius:"50%"}}/>
+          <div style={{position:"absolute",right:"-10px",top:"-10px",width:"130px",height:"130px",border:"1px solid rgba(255,255,255,0.04)",borderRadius:"50%"}}/>
+          <Lbl color="rgba(255,255,255,0.3)" style={{letterSpacing:"4px",marginBottom:"12px"}}>Ton offre Anti K.O™</Lbl>
+          <h2 style={{fontFamily:"var(--font-serif)",fontSize:"clamp(22px,4vw,36px)",fontWeight:"300",margin:"0 0 12px",letterSpacing:"-0.5px"}}>{result.titre}</h2>
+          <p style={{fontSize:"15px",color:"rgba(255,255,255,0.88)",margin:0,lineHeight:"1.7",fontWeight:"300",maxWidth:"560px"}}>{result.promesse}</p>
+        </div>
+
+        {/* ── PAYWALL ── */}
+        {!unlocked&&(
+          <div style={{position:"relative",marginBottom:"10px"}}>
+            <div style={{filter:"blur(6px)",pointerEvents:"none",userSelect:"none",opacity:0.4}} aria-hidden="true">
+              <Card><Lbl>Structure de l'offre</Lbl><p style={{fontSize:"13px",lineHeight:"1.7",marginBottom:"16px",fontWeight:"300"}}>Une offre premium construite autour de ton expertise unique, avec un positionnement clair qui justifie ton tarif sans te brader.</p><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:"6px",marginBottom:"16px"}}>{["Module 1","Module 2","Module 3","Module 4"].map((it,i)=><div key={i} style={{display:"flex",gap:"8px",background:"var(--cream)",padding:"10px 12px"}}><span style={{color:"var(--rouge)",fontWeight:"600",flexShrink:0}}>✓</span><span style={{fontSize:"12px"}}>{it}</span></div>)}</div></Card>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:"10px",marginBottom:"10px"}}>
+                <Card style={{margin:0}}><Lbl>Pricing recommandé</Lbl><div style={{fontFamily:"var(--font-serif)",fontSize:"42px",fontWeight:"300",color:"var(--rouge)",lineHeight:1}}>XXXX€</div></Card>
+                <div style={{background:"#FFF8F0",borderLeft:"4px solid var(--terra)",padding:"24px"}}><Lbl color="var(--terra)">⚠ Erreur à éviter</Lbl></div>
+              </div>
+              <Card>
+                <Lbl>Plan 10 jours</Lbl>
+                {[1,2,3].map(i=><div key={i} style={{display:"grid",gridTemplateColumns:"68px 1fr",gap:"12px",padding:"12px 0",borderBottom:"1px solid var(--cream)"}}><div style={{height:"10px",background:"var(--cream-dk)",borderRadius:"2px"}}/><div><div style={{height:"13px",background:"var(--cream)",borderRadius:"2px",marginBottom:"5px"}}/><div style={{height:"10px",background:"var(--light)",borderRadius:"2px",width:"55%"}}/></div></div>)}
+              </Card>
+            </div>
+            {/* Overlay */}
+            <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(250,247,242,0.78)",backdropFilter:"blur(3px)"}}>
+              <div className="scale-in" style={{background:"var(--white)",border:"1px solid var(--light)",padding:"36px 32px",maxWidth:"400px",width:"92%",textAlign:"center",boxShadow:"0 20px 60px rgba(122,31,31,0.12),0 4px 20px rgba(0,0,0,0.06)"}}>
+                <div style={{fontSize:"32px",marginBottom:"14px"}}>🔒</div>
+                <Lbl style={{textAlign:"center",marginBottom:"14px"}}>Plan complet</Lbl>
+                <p style={{fontSize:"14px",color:"var(--dark)",lineHeight:"1.7",margin:"0 0 6px",fontWeight:"300"}}>Ton offre, ton pricing, ton plan 10 jours et ton script de prospection sont prêts.</p>
+                <p style={{fontSize:"12px",color:"var(--mid)",margin:"0 0 24px",fontStyle:"italic",fontWeight:"300"}}>Déverrouille ton plan complet pour accéder à tout.</p>
+                <div style={{fontFamily:"var(--font-serif)",fontSize:"46px",fontWeight:"300",color:"var(--rouge)",letterSpacing:"-2px",lineHeight:1,marginBottom:"4px"}}>{CFG.prixOutil}</div>
+                <div style={{fontFamily:"var(--font-mono)",fontSize:"9px",color:"#C8B8A8",letterSpacing:"1.5px",marginBottom:"22px"}}>Accès immédiat · Export PDF inclus</div>
+                <a href={CFG.buyURL} target="_blank" rel="noopener noreferrer" style={{display:"block",background:"var(--rouge)",color:"#fff",padding:"15px 28px",fontFamily:"var(--font-mono)",fontSize:"10px",letterSpacing:"2.5px",textDecoration:"none",marginBottom:"18px",textAlign:"center"}}>
+                  Acheter mon plan →
+                </a>
+                <div style={{height:"1px",background:"var(--light)",margin:"0 0 18px"}}/>
+                <div style={{fontFamily:"var(--font-mono)",fontSize:"9px",color:"#C8B8A8",marginBottom:"10px",letterSpacing:"1.5px"}}>Déjà acheté ? Entre ton code d'accès :</div>
+                <div style={{display:"flex",gap:"8px"}}>
+                  <input type="text" value={codeIn} onChange={e=>setCodeIn(e.target.value.toUpperCase())} onKeyDown={e=>e.key==="Enter"&&checkCode()} placeholder="CODE D'ACCÈS"
+                    style={{flex:1,background:"var(--warm)",border:`1px solid ${codeErr?"#FFCCCC":"var(--light)"}`,padding:"11px 14px",fontFamily:"var(--font-mono)",fontSize:"11px",letterSpacing:"2px",color:"var(--dark)",outline:"none",textTransform:"uppercase"}}/>
+                  <button onClick={checkCode} style={{background:"var(--dark)",border:"none",color:"#fff",padding:"11px 18px",cursor:"pointer",fontFamily:"var(--font-mono)",fontSize:"10px",letterSpacing:"1px"}}>OK</button>
+                </div>
+                {codeErr&&<p style={{fontFamily:"var(--font-mono)",fontSize:"10px",color:"var(--rouge)",margin:"8px 0 0"}}>{codeErr}</p>}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── PLAN DÉVERROUILLÉ ── */}
+        {unlocked&&<>
+          {/* Offre */}
+          <Card style={{animation:"fadeUp 0.5s ease both"}}>
+            <Lbl>Structure de l'offre</Lbl>
+            <p style={{fontSize:"14px",color:"#2A1A0A",lineHeight:"1.75",margin:"0 0 18px",fontWeight:"300"}}>{result.offre?.description}</p>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))",gap:"6px",marginBottom:"18px"}}>
+              {(result.offre?.inclus||[]).map((it,i)=>(
+                <div key={i} style={{display:"flex",gap:"8px",alignItems:"flex-start",background:"var(--cream)",padding:"10px 13px"}}>
+                  <span style={{color:"var(--rouge)",fontWeight:"700",flexShrink:0}}>✓</span>
+                  <span style={{fontSize:"12px",color:"#4A3828",lineHeight:"1.5",fontWeight:"300"}}>{it}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:"32px",borderTop:"1px solid var(--light)",paddingTop:"16px"}}>
+              <div><div style={{fontFamily:"var(--font-mono)",fontSize:"7px",letterSpacing:"2.5px",color:"#C8B8A8",marginBottom:"3px"}}>DURÉE</div><div style={{fontSize:"13px"}}>{result.offre?.duree}</div></div>
+              <div><div style={{fontFamily:"var(--font-mono)",fontSize:"7px",letterSpacing:"2.5px",color:"#C8B8A8",marginBottom:"3px"}}>LIVRABLE</div><div style={{fontSize:"13px"}}>{result.offre?.livrable}</div></div>
+            </div>
+          </Card>
+          {/* Pricing + Alerte */}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:"10px",marginBottom:"10px"}}>
+            <Card style={{margin:0}}>
+              <Lbl>Pricing recommandé</Lbl>
+              <div style={{fontFamily:"var(--font-serif)",fontSize:"46px",fontWeight:"300",color:"var(--rouge)",letterSpacing:"-2px",lineHeight:1,marginBottom:"5px"}}>{result.pricing?.prix}</div>
+              <div style={{fontFamily:"var(--font-mono)",fontSize:"9px",color:"#C8B8A8",marginBottom:"10px",letterSpacing:"1px"}}>Fourchette · {result.pricing?.fourchette}</div>
+              <div style={{display:"inline-block",background:"var(--cream)",padding:"3px 12px",fontFamily:"var(--font-mono)",fontSize:"8px",color:"var(--mid)",marginBottom:"12px"}}>{result.pricing?.niveau}</div>
+              <p style={{fontSize:"12px",color:"#4A3828",lineHeight:"1.6",fontWeight:"300"}}>{result.pricing?.logique}</p>
+            </Card>
+            <div style={{background:"#FFF8F0",borderLeft:"4px solid var(--terra)",padding:"24px 22px"}}>
+              <Lbl color="var(--terra)" style={{marginBottom:"12px"}}>⚠ Erreur à éviter</Lbl>
+              <p style={{fontSize:"13px",color:"#3A2010",lineHeight:"1.7",fontWeight:"300"}}>{result.alerte}</p>
+            </div>
+          </div>
+          {/* Plan */}
+          <Card>
+            <Lbl>Plan d'action 10 jours</Lbl>
+            {(result.plan||[]).map((it,i)=>(
+              <div key={i} style={{display:"grid",gridTemplateColumns:"72px 1fr",gap:"14px",borderBottom:i<result.plan.length-1?"1px solid var(--cream)":"none",padding:"13px 0",alignItems:"start"}}>
+                <div style={{fontFamily:"var(--font-mono)",fontSize:"9px",color:"var(--rouge)",fontWeight:"500",letterSpacing:"0.5px",paddingTop:"2px"}}>{it.j}</div>
+                <div>
+                  <div style={{fontSize:"13px",lineHeight:"1.55",marginBottom:"4px"}}>{it.action}</div>
+                  <div style={{fontSize:"12px",color:"var(--mid)",fontStyle:"italic",fontWeight:"300"}}>→ {it.resultat}</div>
+                </div>
+              </div>
+            ))}
+          </Card>
+          {/* Script */}
+          <Card>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"16px"}}>
+              <Lbl style={{marginBottom:0}}>Script de prospection</Lbl>
+              <button onClick={copyScript} style={{background:copied?"var(--green)":"var(--cream)",border:"none",color:copied?"#fff":"var(--mid)",padding:"7px 16px",cursor:"pointer",fontFamily:"var(--font-mono)",fontSize:"9px",letterSpacing:"2px",transition:"all 0.2s ease"}}>
+                {copied?"✓ Copié !":"Copier"}
+              </button>
+            </div>
+            <div style={{background:"var(--cream)",padding:"11px 16px",fontFamily:"var(--font-mono)",fontSize:"10px",color:"var(--mid)",marginBottom:"12px",letterSpacing:"0.5px"}}>✉ Objet : {result.script?.objet}</div>
+            <div style={{fontSize:"14px",color:"#2A1A0A",lineHeight:"1.85",background:"var(--warm)",padding:"18px 20px",whiteSpace:"pre-wrap",borderLeft:"2px solid var(--light)",fontWeight:"300"}}>{result.script?.corps}</div>
+          </Card>
+          {/* Action CTA */}
+          <div style={{background:"var(--rouge)",color:"#fff",padding:"24px 30px",display:"flex",alignItems:"flex-start",gap:"18px",marginBottom:"10px"}}>
+            <div style={{fontSize:"24px",flexShrink:0,marginTop:"2px"}}>→</div>
+            <div>
+              <Lbl color="rgba(255,255,255,0.3)" style={{letterSpacing:"3.5px",marginBottom:"8px"}}>Prochaine action — Dans les 2h</Lbl>
+              <p style={{fontSize:"15px",margin:0,lineHeight:"1.65",fontWeight:"300"}}>{result.action_aujourd_hui}</p>
+            </div>
+          </div>
+        </>}
+
+        {/* Upsell */}
+        <div style={{border:"1px solid var(--light)",padding:"32px 28px",textAlign:"center",marginBottom:"36px",position:"relative",overflow:"hidden",background:"var(--white)"}}>
+          <div style={{position:"absolute",top:0,left:0,right:0,height:"3px",background:"linear-gradient(to right, var(--rouge), var(--terra), var(--gold))"}}/>
+          <Lbl style={{textAlign:"center",marginBottom:"14px"}}>Envie d'aller plus vite ?</Lbl>
+          <p style={{fontFamily:"var(--font-serif)",fontSize:"20px",fontWeight:"300",color:"var(--dark)",lineHeight:"1.65",margin:"0 auto 8px",maxWidth:"480px",letterSpacing:"-0.2px"}}>
+            Ce plan est un point de départ. {CFG.prenom} t'accompagne pour le transformer en résultats concrets — dès cette semaine.
+          </p>
+          <p style={{fontSize:"12px",color:"var(--mid)",margin:"0 0 24px",fontStyle:"italic",fontWeight:"300"}}>Séance intensive · {CFG.prixAccomp} · Résultats mesurables en 10 jours</p>
+          <div style={{display:"flex",gap:"10px",justifyContent:"center",flexWrap:"wrap"}}>
+            <a href={CFG.calLink} target="_blank" rel="noopener noreferrer" style={{textDecoration:"none"}}>
+              <Btn style={{padding:"15px 32px"}}>Réserver mon appel ({CFG.prixAppel}) →</Btn>
+            </a>
+            <a href={`mailto:${CFG.email}?subject=Accompagnement Anti K.O™`} style={{textDecoration:"none"}}>
+              <Btn variant="secondary" style={{padding:"14px 24px"}}>Écrire à {CFG.prenom}</Btn>
+            </a>
+          </div>
+        </div>
+        {/* Footer */}
+        <div style={{textAlign:"center"}}>
+          <p style={{fontFamily:"var(--font-mono)",fontSize:"8px",color:"#C8B8A8",letterSpacing:"2.5px",marginBottom:"18px"}}>Méthode Anti K.O™ · {CFG.site.toUpperCase()}</p>
+          <div style={{display:"flex",gap:"10px",justifyContent:"center",flexWrap:"wrap"}}>
+            {unlocked&&<Btn onClick={exportPDF}>↓ Exporter en PDF</Btn>}
+            <Btn variant="secondary" onClick={reset}>Nouveau diagnostic</Btn>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return null;
+}
+
+ReactDOM.render(<App/>, document.getElementById("root"));
+</script>
+</body>
+</html>
